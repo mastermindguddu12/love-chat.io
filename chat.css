@@ -1,0 +1,174 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Full height layout */
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: #e5ddd5;
+}
+
+/* Chat List Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    background-color: #075E54;
+    color: white;
+    font-size: 24px; /* Match header font size */
+    text-align: center;
+}
+
+/* Add Friend Section */
+.add-friend-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ccc;
+}
+
+.add-friend-section input {
+    flex: 1;
+    padding: 15px;
+    font-size: 20px;
+    border-radius: 25px;
+    border: 2px solid #ccc;
+    outline: none;
+    margin-right: 10px;
+}
+
+.add-friend-section button {
+    background-color: #075E54;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.add-friend-section button:hover {
+    background-color: #128C7E;
+}
+
+#add-friend-status {
+    font-size: 18px;
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* Chat List Section */
+.chat-list {
+    height: calc(100vh - 140px); /* Adjust height based on header and add friend sections */
+    overflow-y: auto;
+    padding: 15px;
+    background-color: #ffffff;
+}
+
+.chat-item {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.chat-item:hover {
+    background-color: #f1f1f1;
+}
+
+.chat-item img {
+    border-radius: 50%;
+    margin-right: 15px;
+    width: 60px;
+    height: 60px;
+}
+
+/* Chat info */
+.chat-info {
+    flex: 1;
+}
+
+.chat-info h3 {
+    font-size: 22px; /* Match header font size */
+    margin-bottom: 5px;
+    color: #075E54;
+}
+
+.chat-info p {
+    font-size: 18px;
+    color: #999;
+}
+
+/* Time in chat list */
+.chat-info .last-message-time {
+    font-size: 18px;
+    color: #999;
+    text-align: right;
+}
+
+/* Highlight unread messages */
+.unread {
+    background-color: #e6f7ff;
+}
+
+.unread h3, .unread p {
+    font-weight: bold;
+    color: #075E54;
+}
+
+/* Scrollbar customization */
+.chat-list::-webkit-scrollbar {
+    width: 10px;
+}
+
+.chat-list::-webkit-scrollbar-thumb {
+    background-color: #075E54;
+    border-radius: 5px;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .header {
+        font-size: 20px;
+    }
+
+    .add-friend-section input {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    .add-friend-section button {
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .chat-item img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .chat-info h3 {
+        font-size: 20px;
+    }
+
+    .chat-info p {
+        font-size: 16px;
+    }
+
+    .chat-info .last-message-time {
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login</title>
+    <link rel="stylesheet" href="auth.css">
+    <script>
+        // Loading screen logic
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('login-form').style.display = 'block';
+            }, 2000);
+        });
+    </script>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen">
+        <img src="logo.png" alt="Loading" class="rounded-image">
+    </div>
+
+    <div id="login-form" style="display:none;">
+        <h2>Login</h2>
+        <input type="email" id="login-email" placeholder="Email">
+        <input type="password" id="login-password" placeholder="Password">
+        <button id="login-btn">Login</button>
+        <p>Don't have an account? <a href="signup.html">Sign up</a></p>
+    </div>
+
+    <footer>
+        Developed by Guddu Choudhary
+    </footer>
+
+    <script type="module" src="login.js"></script>
+</body>
+</html>

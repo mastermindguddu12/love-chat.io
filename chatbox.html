@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Box</title>
+    <link rel="stylesheet" href="box.css">
+</head>
+<body>
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <img id="profile-pic" src="" alt="Profile Picture" width="50" height="50">
+        <div class="chat-info">
+            <h3 id="username">Username</h3>
+            <p id="status">Online/Offline</p>
+        </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div id="chat-messages" class="chat-messages">
+        <!-- Messages will be displayed here -->
+    </div>
+
+    <!-- Typing Indicator -->
+    <div id="typing-status"></div>
+
+    <!-- Chat Input -->
+    <div class="chat-input">
+        <input type="text" id="message-input" placeholder="Type a message..." />
+        <button id="send-btn">Send</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, onSnapshot, setDoc, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+      apiKey: "AIzaSyBrcvGYxSokJDNdVbHurV660DAVsOBC1Ic",
+  authDomain: "love-chat-d0d63.firebaseapp.com",
+  databaseURL: "https://love-chat-d0d63-default-rtdb.firebaseio.com",
+  projectId: "love-chat-d0d63",
+  storageBucket: "love-chat-d0d63.appspot.com",
+  messagingSenderId: "136678490864",
+  appId: "1:136678490864:web:dfd927dc43c5118738f835"
+};      
+
+
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+        const auth = getAuth();
+
+        const chatMessagesDiv = document.getElementById("chat-messages");
+        const messageInput = document.getElementById("message-input");
+        const sendBtn = document.getElementById("send-btn");
+        const typingStatusDiv = document.getElementById("typing-status");
+
+        let chatId = "";
+        let currentUser = null;
+        let friendId = "";
+
+        // Function to load chat messages
+        async function loadChatMessages(chatId) {
+            const messagesRef = collection(db, "chats", chatId, "messages");
+            const messagesQuery = query(messagesRef, orderBy("timestamp", "asc"));
+
+            onSnapshot(messagesQuery, (snapshot) => {
+                chatMessagesDiv.innerHTML = "";
+                snapshot.forEach(doc => {
+                    const messageData = doc.data();
+                    const messageElement = document.createElement("div");
+                    const ticks = getMessageTicks(messageData.status);
+
+                    messageElement.className = messageData.senderId === currentUser.uid ? "message-sent" : "message-received";
+                    messageElement.innerHTML = `<b>${messageData.senderName}:</b> ${messageData.message} <span class="tick">${ticks}</span>`;
+                    
+                    chatMessagesDiv.appendChild(messageElement);
+
+                    // Update message to "seen" when friend reads it
+                    if (messageData.senderId !== currentUser.uid && messageData.status !== 'seen') {
+                        updateMessageStatus(chatId, doc.id, 'seen');
+                    }
+                });
+
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight; // Auto scroll to bottom
+            });
+        }
+
+        // Function to get tick marks based on message status
+        function getMessageTicks(status) {
+            if (status === 'sent') {
+                return '✔'; // Single tick
+            } else if (status === 'delivered') {
+                return '✔✔'; // Double tick
+            } else if (status === 'seen') {
+                return '<span style="color: blue;">✔✔</span>'; // Blue double tick
+            }
+            return '';
+        }
+
+        // Function to send a message
+        async function sendMessage(chatId, message) {
+            const messageData = {
+                message,
+                senderId: currentUser.uid,
+                senderName: currentUser.displayName || "You",
+                status: 'sent', // Initial status is "sent"
+                timestamp: serverTimestamp(),
+            };
+
+            // Add message to Firestore
+            const docRef = await addDoc(collection(db, "chats", chatId, "messages"), messageData);
+
+            // Update the main chat document with the last message details
+            await setDoc(doc(db, "chats", chatId), {
+                participants: [currentUser.uid, friendId],
+                lastMessage: message,
+                lastMessageTimestamp: serverTimestamp(),
+                lastMessageSenderId: currentUser.uid
+            }, { merge: true });
+
+            // Clear the input after sending
+            messageInput.value = "";
+
+            // Remove typing status after sending
+            updateTypingStatus(false);
+        }
+
+        // Update message status
+        async function updateMessageStatus(chatId, messageId, status) {
+            await updateDoc(doc(db, "chats", chatId, "messages", messageId), { status });
+        }
+
+        // Update typing status in Realtime Database
+        function updateTypingStatus(isTyping) {
+            const typingRef = ref(rtdb, `chats/${chatId}/typing/${currentUser.uid}`);
+            set(typingRef, isTyping);
+        }
+
+        // Listen for authentication state changes
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+
+                // Get friendId from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                friendId = urlParams.get("friendId");
+
+                // Generate or get chatId based on users
+                chatId = currentUser.uid < friendId ? `${currentUser.uid}_${friendId}` : `${friendId}_${currentUser.uid}`;
+
+                // Load friend details (profile pic, username)
+                getFriendDetails(friendId);
+                loadChatMessages(chatId);
+                listenToTypingStatus(); // Listen for typing status
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        // Function to get friend details
+        async function getFriendDetails(friendId) {
+            const userRef = doc(db, "users", friendId);
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                document.getElementById("profile-pic").src = userData.dpUrl || "default_profile.png";
+                document.getElementById("username").textContent = userData.username;
+                document.getElementById("status").textContent = userData.isOnline ? "Online" : "Offline";
+            }
+        }
+
+        // Listen for typing status
+        function listenToTypingStatus() {
+            const typingRef = ref(rtdb, `chats/${chatId}/typing/${friendId}`);
+            onValue(typingRef, (snapshot) => {
+                const isTyping = snapshot.val();
+                typingStatusDiv.textContent = isTyping ? "Typing..." : "";
+            });
+        }
+
+        // Detect typing in the message input
+        messageInput.addEventListener("input", () => {
+            updateTypingStatus(messageInput.value.trim() !== "");
+        });
+
+        // Send message button click event
+        sendBtn.addEventListener("click", () => {
+            const message = messageInput.value;
+            if (message.trim()) {
+                sendMessage(chatId, message);
+            }
+        });
+
+        // Handle Enter key for sending message
+        messageInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault(); // Prevent newline
+                sendBtn.click();
+            }
+        });
+    </script>
+
+</body>
+</html>

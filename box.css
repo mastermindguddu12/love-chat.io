@@ -1,0 +1,193 @@
+/* Reset some default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Full height layout */
+html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    background-color: #e5ddd5;
+}
+
+/* Chat Header */
+.chat-header {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background-color: #075E54;
+    color: white;
+    font-size: 24px; /* Bigger size */
+}
+
+.chat-header img {
+    border-radius: 50%;
+    margin-right: 15px;
+    width: 60px; /* Bigger profile picture */
+    height: 60px;
+}
+
+.chat-header .chat-info h3 {
+    margin-bottom: 5px;
+    font-size: 22px; /* Bigger text */
+}
+
+.chat-header .chat-info p {
+    margin: 0;
+    font-size: 18px;
+    color: #d2d2d2;
+}
+
+/* Chat Messages */
+.chat-messages {
+    flex: 1;
+    padding: 20px; /* Increased padding */
+    overflow-y: auto;
+    background-color: #e5ddd5;
+    font-size: 20px; /* Bigger message text */
+}
+
+.message-content {
+    margin-bottom: 15px;
+    padding: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    position: relative;
+}
+
+.message-sent {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    border-radius: 10px 10px 0 10px;
+}
+
+.message-received {
+    background-color: white;
+    align-self: flex-start;
+    border-radius: 10px 10px 10px 0;
+}
+
+.message-meta {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 18px; /* Bigger meta text (for ticks and time) */
+    color: #999;
+}
+
+.time {
+    margin-left: 10px;
+}
+
+.tick {
+    font-size: 18px; /* Bigger tick mark */
+    color: #34b7f1;
+}
+
+/* Chat Input */
+.chat-input {
+    display: flex;
+    align-items: center;
+    background-color: #f0f0f0;
+    padding: 15px; /* Bigger padding */
+    border-top: 1px solid #ccc;
+    position: fixed;
+    bottom: 0; /* Always stick to the bottom */
+    width: 100%;
+}
+
+#message-input {
+    flex: 1;
+    padding: 15px; /* Bigger input padding */
+    font-size: 20px; /* Bigger input text */
+    border-radius: 25px;
+    border: 2px solid #ccc;
+    outline: none;
+}
+
+#send-btn {
+    background-color: #075E54;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 50%;
+    margin-left: 15px;
+    cursor: pointer;
+    font-size: 18px; /* Bigger button text */
+}
+
+#send-btn:hover {
+    background-color: #128C7E;
+}
+
+/* Typing Indicator */
+#typing-status {
+    font-size: 18px; /* Bigger typing indicator */
+    color: #999;
+    padding-left: 15px;
+    padding-bottom: 5px;
+    position: fixed;
+    bottom: 70px; /* Adjusted position to show above input box */
+    width: 100%;
+}
+
+/* Make the chat fit full screen */
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.chat-header, .chat-input {
+    flex-shrink: 0;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: scroll;
+    margin-bottom: 80px; /* Provide space for the input box */
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+    .chat-header {
+        padding: 10px;
+    }
+
+    .chat-header img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .chat-header .chat-info h3 {
+        font-size: 20px;
+    }
+
+    .chat-header .chat-info p {
+        font-size: 16px;
+    }
+
+    #message-input {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    #send-btn {
+        padding: 12px;
+    }
+
+    .message-content {
+        font-size: 18px;
+    }
+
+    .message-meta {
+        font-size: 16px;
+    }
+
+    #typing-status {
+        font-size: 16px;
+    }
+}
